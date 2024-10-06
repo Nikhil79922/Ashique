@@ -1,7 +1,7 @@
 /* eslint-disable no-unused-vars */
-import React, { useState, useContext } from 'react';
+import React, { useState } from 'react';
 import axios from 'axios';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 
 const ResetPassword = () => {
@@ -12,29 +12,37 @@ const ResetPassword = () => {
   const [loading, setLoading] = useState(false);
   const location = useLocation(); // Get the location object from React Router
 
-   //Redux
-   const globalLink=useSelector((state)=>state.link);
+  // Redux
+  const globalLink = useSelector((state) => state.link);
 
   // Extract the token from the query parameters
   const queryParams = new URLSearchParams(location.search);
   const token = queryParams.get('token');
 
-  console.log(token)
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (password !== confirmPassword) {
       setError('Passwords do not match');
+      setMessage(''); // Clear message if error appears
       return;
     }
     setLoading(true);
     setError('');
     setMessage('');
+
     try {
-      await axios.post(`${globalLink}/reset-password?token=${token}`, { password });
+      await axios.post(`${globalLink}auth/reset-password?token=${token}`, { password });
       setMessage('Password has been successfully reset.');
+      setError(''); // Clear error if success message appears
     } catch (error) {
-      setError(error.response?.data?.error || 'Password reset failed');
+      const errorMessage = error.response?.data?.error;
+
+      if (errorMessage === 'TokenExpiredError') {
+        setError('Reset link has expired. Please request a new password reset link.');
+      } else {
+        setError(error.response?.data?.message || 'Password reset failed');
+      }
+      setMessage(''); // Clear success message if error appears
     } finally {
       setLoading(false);
     }
@@ -69,7 +77,7 @@ const ResetPassword = () => {
               className="w-full px-4 py-2 border border-gray-600 bg-gray-700 text-white rounded-lg focus:outline-none focus:border-blue-500 transition duration-300"
             />
           </div>
-          <button 
+          <button
             type="submit"
             disabled={loading}
             className={`w-full bg-gradient-to-r from-blue-500 to-teal-500 text-white px-4 py-2 rounded-lg shadow-lg transform transition-transform hover:scale-105 hover:shadow-2xl focus:outline-none ${

@@ -24,7 +24,7 @@ const AdminNavbar = () => {
       <div className="container mx-auto px-4 py-3 flex items-center justify-between">
         {/* Logo */}
         <Link to="/adminHome" className="text-2xl font-bold">
-          <img src="https://via.placeholder.com/150" alt="Admin Logo" className="h-10 w-10 rounded-lg" />
+          <img src="https://design4users.com/wp-content/uploads/2016/10/horsy_animation_logo_tubik_studio.gif" alt="Admin Logo" className="h-[40px] w-[65px] rounded-xl" />
         </Link>
 
         {/* Links */}

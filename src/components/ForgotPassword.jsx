@@ -19,7 +19,7 @@ const ForgotPassword = () => {
     setError(''); // Reset error
     setMessage(''); // Reset message
     try {
-      await axios.post(globalLink + '/forgot-password', { email });
+      await axios.post(globalLink + 'auth/forget-password', { email });
       setMessage('Password reset link has been sent to your email.');
     } catch (error) {
       setError(error.response?.data?.error || 'Password reset failed');

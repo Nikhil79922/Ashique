@@ -1,72 +1,98 @@
 /* eslint-disable react/no-unescaped-entities */
+/* eslint-disable react/no-unknown-property */
 /* eslint-disable no-unused-vars */
-import React, { useState, useEffect,useContext } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
-
 import { useSelector } from 'react-redux';
+import { Transition } from '@headlessui/react'; // Ensure you have headlessui installed
 
 const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
-  const [loading, setLoading] = useState(false); // Loading state
-  const [isLoggedIn, setIsLoggedIn] = useState(false); // State to track login status
+  const [loading, setLoading] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [showErrorToast, setShowErrorToast] = useState(false);
+  const [progress, setProgress] = useState(0); // Start at 0% for the progress bar
   const navigate = useNavigate();
+  const globalLink = useSelector((state) => state.link);
 
-  //use context
-  const globalLink=useSelector((state)=>state.link);
-
-  // Check if the user is already logged in
   useEffect(() => {
     const token = localStorage.getItem('token');
-    const ROLE = localStorage.getItem('ROLE');
     if (token) {
       setIsLoggedIn(true);
     }
   }, []);
 
+  useEffect(() => {
+    // Hide the error toast after 4 seconds
+    if (showErrorToast) {
+      const timer = setTimeout(() => {
+        setShowErrorToast(false);
+      }, 4000);
+
+      return () => clearTimeout(timer); // Clear the timer on unmount
+    }
+  }, [showErrorToast]);
+
+  useEffect(() => {
+    // Progress bar animation
+    if (showErrorToast) {
+      let progressTimer = 0;
+      setProgress(0); // Reset progress when toast is shown
+      const interval = setInterval(() => {
+        progressTimer += 100; // Increment timer by 100ms
+        setProgress((prev) => Math.min(100, prev + 2.5)); // Increase progress to 100% over 4000ms
+        if (progressTimer >= 4000) {
+          clearInterval(interval); // Stop the interval after 4000ms
+        }
+      }, 100);
+
+      return () => clearInterval(interval); // Cleanup on unmount
+    } else {
+      setProgress(0); // Reset progress when toast is closed
+    }
+  }, [showErrorToast]);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setLoading(true); // Set loading to true when submitting
-    setError(''); // Reset any previous error messages
+    setLoading(true);
+    setError('');
+    setShowErrorToast(false); // Hide toast on new submission
 
     try {
-      const response = await axios.post(globalLink+"/login", { email, password });
-      localStorage.setItem('token', response.data.token);
-      localStorage.setItem('ROLE', response.data.user.role);
-      const dt = await response.data;
-      console.log(dt)
-
-      setIsLoggedIn(true); // Set login state to true
-      navigate('/'); // Redirect on successful login
+      const response = await axios.post(`${globalLink}auth/Login`, { email, password });
+      localStorage.setItem('token', response.data.JWT_token);
+      localStorage.setItem('ROLE', response.data.role);
+      setIsLoggedIn(true);
+      navigate('/');
     } catch (error) {
       setError(error.response?.data?.error || 'Login failed');
+      setShowErrorToast(true); // Show error toast on failure
     } finally {
-      setLoading(false); // Stop loading after request completes
+      setLoading(false);
     }
   };
 
-  // Handle logout
   const handleLogout = () => {
-    localStorage.removeItem('token'); // Remove the token from localStorage
-    setIsLoggedIn(false); // Set login state to false
-    navigate('/login'); // Redirect to the login page
+    localStorage.removeItem('token');
+    setIsLoggedIn(false);
+    navigate('/login');
+  };
+
+  const closeToast = () => {
+    setShowErrorToast(false);
   };
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-gradient-to-r from-gray-900 via-gray-800 to-gray-900">
       <div className="relative bg-gray-900 p-8 rounded-lg shadow-lg w-full max-w-md border border-gray-700 overflow-hidden">
-        {/* Dark overlay effect */}
         <div className="absolute inset-0 bg-gradient-to-br from-gray-800 to-gray-900 opacity-40"></div>
-
-        {/* Main content */}
         <div className="relative z-10">
-          {/* Conditionally render login or logout */}
           {!isLoggedIn ? (
             <>
               <h2 className="text-3xl font-bold mb-6 text-center text-white">Login</h2>
-              {error && <p className="text-red-500 mb-4 text-center">{error}</p>}
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div>
                   <label htmlFor="email" className="block text-gray-300">Email</label>
@@ -93,7 +119,7 @@ const Login = () => {
                 <button
                   type="submit"
                   className={`w-full px-4 py-2 rounded-lg text-white ${loading ? 'bg-gray-600' : 'bg-gradient-to-r from-blue-600 to-teal-500'} transition-all duration-300 hover:opacity-90`}
-                  disabled={loading} // Disable button when loading
+                  disabled={loading}
                 >
                   {loading ? 'Logging in...' : 'Login'}
                 </button>
@@ -117,10 +143,66 @@ const Login = () => {
           )}
         </div>
       </div>
+
+      {/* Error Toast */}
+      <Transition
+        show={showErrorToast}
+        enter="transition ease-in-out duration-1000 transform"
+        enterFrom="translate-y-[-100%] opacity-0"
+        enterTo="translate-y-0 opacity-100"
+        leave="transition ease-in-out duration-500 transform"
+        leaveFrom="translate-y-0 opacity-100"
+        leaveTo="translate-y-[100%] opacity-0"
+      >
+        <div
+          className={`fixed bottom-4 right-4 bg-gradient-to-t from-gray-900 to-gray-800 border border-gray-700 text-white p-4 rounded-lg shadow-lg z-50 flex flex-col w-72 ${showErrorToast ? 'bounce' : ''}`}
+        >
+          <div className="flex justify-between items-center">
+            <h3 className="text-lg font-semibold">Login Error</h3>
+            <button
+              onClick={closeToast}
+              className="text-white text-xl font-bold hover:opacity-80 transition-opacity"
+            >
+              ✖️
+            </button>
+          </div>
+          <p className="text-red-400">{error}</p>
+          {/* Progress Bar */}
+          <div className="relative w-full h-1 bg-gray-600 mt-2 rounded-lg overflow-hidden">
+            <div
+              className="absolute top-0 left-0 h-full bg-white transition-all duration-4000"
+              style={{ width: `${progress}%` }}
+            ></div>
+          </div>
+        </div>
+      </Transition>
+
+      {/* CSS for Bouncing Effect */}
+      <style jsx>{`
+        @keyframes bounce {
+          0% {
+            transform: translateY(0);
+          }
+          25% {
+            transform: translateY(-80px);
+          }
+          50% {
+            transform: translateY(15px);
+          }
+          75% {
+            transform: translateY(-30px);
+          }
+          100% {
+            transform: translateY(0);
+          }
+        }
+
+        .bounce {
+          animation: bounce 1s ease forwards;
+        }
+      `}</style>
     </div>
   );
 };
 
 export default Login;
-
-

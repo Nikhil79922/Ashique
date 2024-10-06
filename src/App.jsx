@@ -2,7 +2,7 @@
 
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable no-unused-vars */
-import React, { useState , useEffect , useCallback } from 'react';
+import React, { useEffect } from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import Invoice from "./components/Invoice";
 import Home from './components/Home';
@@ -26,35 +26,27 @@ const App = () => {
   const globalLink=useSelector((state)=>state.link);
   const toggle=useSelector((state)=>state.toggle);
 
-  console.log(toggle)
-  console.log(globalLink);
   const token = localStorage.getItem('token');
-  
-const auth= useCallback(async ()=>{
 
-  const response = await fetch(globalLink+'/auth',{
+const auth=async ()=>{
 
-    body:JSON.stringify('Authorization',`Bearer ${token}`)  
-
+  const response = await fetch(globalLink+'auth',{
+    method: 'GET',
+  headers:{'Authorization':`Bearer ${token}`}
   }) 
   const data = response.status;
-  const loginSaver= await response.data
 
-if(data==404){
+if(data==403){
+  console.log("should not runn")
   localStorage.removeItem('token')
   localStorage.removeItem('ROLE')
   toggle
 }
-else{
-  localStorage.setItem('token',loginSaver)
 }
-})
 
 useEffect(()=>{
   auth()
-  console.log("hwlow")
 },[])
-
 
   return (
     <Router>
