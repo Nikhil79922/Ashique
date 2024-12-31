@@ -33,7 +33,7 @@ const Home = () => {
     },
     {
       id: 4,
-      image: "https://images.unsplash.com/photo-1542193810-9007c21cd37e?fm=jpg&q=60&w=3000&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8M3x8cmV2b2x0fGVufDB8fDB8fHww",
+      image: "https://e0.pxfuel.com/wallpapers/11/309/desktop-wallpaper-buy-logitech-g903-wireless-gaming-mouse-for-just-114-99-coupon.jpg",
       name: "Technical Product 4",
       price: "$40",
       description: "Detailed description of Technical Product 4",
