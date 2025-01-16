@@ -42,40 +42,40 @@ console.log(toggle)
   };
 
   return (
-    <nav className="bg-slate-900 p-4 shadow-lg">
-      <div className="container mx-auto flex items-center justify-between">
+    <nav className="bg-slate-900 sm:h-[67px] p-4 shadow-lg">
+      <div className="container  mx-auto flex items-center sm:justify-between">
         {/* Dynamic Logo */}
         <Link to="/" className="flex items-center text-white text-2xl font-bold">
           {!socialIcon ? (
             <img
             src="https://design4users.com/wp-content/uploads/2016/10/horsy_animation_logo_tubik_studio.gif" // Replace with the path to the default logo
             alt="Default Logo"
-            className="h-10 w-16 rounded-2xl"
+            className=" hidden  sm:block h-10 w-16 rounded-2xl"
             />
           ) : (
             <img
               src="https://media4.giphy.com/media/l3vR16pONsV8cKkWk/giphy.gif?cid=6c09b952g3hmlgd2mhts8t0f56cmh4vq86jqkl68gf2rjk7y&ep=v1_internal_gif_by_id&rid=giphy.gif&ct=g" // Replace with the path to the logged-in logo
               alt="Logged-in Logo"
-              className="h-12 w-16 rounded-2xl bg-transparent"
+              className="hidden sm:block h-10 w-16 rounded-2xl bg-transparent"
             />
           )}
 
         </Link>
 
-        <div className="flex items-center space-x-6">
+        <div className="flex items-center pr-[20vw] text-[14px] sm:text sm:pr-0 space-x-[9px] sm:space-x-6">
           <Link to="/" className="text-white hover:underline">Home</Link>
           <Link to="/products" className="text-white hover:underline">Products</Link>
-          <Link to="/contact" className="text-white hover:underline">Contact Us</Link>
+          <Link to="/contact" className="text-white hover:underline">Contact</Link>
 
           {/* Conditionally render Login or Logout */}
           {!socialIcon ? (
-            <Link to="/login" className="bg-white text-purple-600 px-4 py-2 rounded-lg hover:bg-gray-200 transition">
+            <Link to="/login" className="bg-white text-purple-600 px-2 py-1 sm:px-4 sm:py-2 rounded-lg hover:bg-gray-300 transition">
               Login
             </Link>
           ) : (
             <button
               onClick={handleLogout}
-              className="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition"
+              className="bg-red-500 text-white px-2 py-1 sm:px-4 sm:py-2 rounded-lg hover:bg-red-600 transition"
             >
               Logout
             </button>

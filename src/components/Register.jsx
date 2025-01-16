@@ -4,6 +4,7 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import { Transition } from '@headlessui/react';
+import { ToastContainer, toast } from 'react-toastify';
 
 const Register = () => {
   const [name, setName] = useState('');
@@ -13,6 +14,7 @@ const Register = () => {
   const [role, setRole] = useState('ROLE_USER');
   const [notifications, setNotifications] = useState([]); // Array for notifications
   const navigate = useNavigate();
+  const notify = () => toast("Wow so easy!");
   
   const globalLink = useSelector((state) => state.link);
   const timeoutRef = useRef(null);
@@ -75,9 +77,15 @@ const Register = () => {
   };
 
   return (
+    
     <div className="bg-gradient-to-r from-gray-900 to-black min-h-screen flex items-center justify-center relative">
       <div className="bg-gray-800 p-8 rounded-lg shadow-lg w-full max-w-md">
         <h2 className="text-2xl font-bold text-white mb-6">Register</h2>
+
+        <div>
+        <button onClick={notify}>Notify!</button>
+        <ToastContainer />
+      </div>
 
         <form onSubmit={handleSubmit}>
           <div className="mb-4">
